@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Jogo do Pedido - Roxo Palácio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #2d1b3d 0%, #1a0f26 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: #f5effa;
+            border-radius: 70px 70px 70px 70px;
+            padding: 35px 30px 30px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), 0 0 0 3px #b8a0c9 inset;
+            transition: 0.3s;
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2d1b3d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 4px solid #b8a0c9;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .title span {
+            background: #7b3f8a;
+            color: white;
+            padding: 0 18px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+        }
+
+        .title .roxo-destaque {
+            background: #7b3f8a;
+            color: #f5effa;
+            padding: 2px 20px;
+            border-radius: 60px;
+            font-size: 1.6rem;
+        }
+
+        /* Estilo das abas (etapas) */
+        .aba {
+            display: none;
+            background: #f5effa;
+            padding: 24px 22px;
+            border-radius: 50px;
+            margin: 15px 0 20px;
+            border-left: 10px solid #7b3f8a;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.04);
+            animation: fadeUp 0.35s ease;
+        }
+
+        .aba.ativa {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .aba h2 {
+            color: #2d1b3d;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .aba p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #1a0f26;
+        }
+
+        .aba strong {
+            background: #d9c6e3;
+            padding: 2px 14px;
+            border-radius: 40px;
+            color: #2d1b3d;
+        }
+
+        .cor-destaque {
+            background: #7b3f8a;
+            color: #f5effa;
+            padding: 4px 20px;
+            border-radius: 60px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .lista-materiais {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            background: #d9c6e3;
+            padding: 12px 16px;
+            border-radius: 60px;
+            margin: 12px 0;
+            font-weight: 600;
+            color: #2d1b3d;
+        }
+
+        .valor-box {
+            background: #2d1b3d;
+            color: #f5effa;
+            padding: 14px 18px;
+            border-radius: 60px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 12px 0;
+        }
+
+        .plano {
+            background: #d9c6e3;
+            padding: 12px 18px;
+            border-radius: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 12px 0;
+            color: #2d1b3d;
+        }
+
+        .amostra-cor {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #e8ddf0;
+            padding: 10px 18px;
+            border-radius: 60px;
+            margin: 10px 0;
+        }
+
+        .quadrado-cor {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: #6b2f7a;
+            border: 3px solid #4a2055;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Botões de navegação e escolha */
+        .botoes-aba {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.07s ease;
+            box-shadow: 0 6px 0 #a8b2c7, 0 6px 14px rgba(0,0,0,0.2);
+            background: white;
+            color: #2d1b3d;
+            border: 2px solid #cdd6e8;
+            flex: 1 1 auto;
+            min-width: 120px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #8a94aa;
+        }
+
+        .btn-primary {
+            background: #7b3f8a;
+            border-color: #5a2c66;
+            box-shadow: 0 6px 0 #3d1d47;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-primary:hover {
+            background: #8f4fa0;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            border-color: #1e8449;
+            box-shadow: 0 6px 0 #145a32;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            border-color: #b03a2e;
+            box-shadow: 0 6px 0 #78281f;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-secondary {
+            background: #d9c6e3;
+            border-color: #b8a0c9;
+            box-shadow: 0 6px 0 #9a82ab;
+            color: #2d1b3d;
+        }
+
+        /* Tela final de comemoração / tristeza */
+        .tela-final {
+            display: none;
+            text-align: center;
+            padding: 25px 10px;
+            border-radius: 70px;
+            margin: 10px 0;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .tela-final.ativa {
+            display: block;
+        }
+
+        .tela-final h2 {
+            font-size: 3rem;
+        }
+
+        .tela-final p {
+            font-size: 1.5rem;
+            margin: 15px 0;
+        }
+
+        .emoji-gigante {
+            font-size: 5rem;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: right;
+            color: #4a2a5a;
+            border-top: 2px solid #c9b4d6;
+            padding-top: 16px;
+            font-style: italic;
+        }
+
+        .cor-badge {
+            background: #6b2f7a;
+            color: white;
+            padding: 2px 16px;
+            border-radius: 60px;
+            font-weight: 700;
+        }
+
+        /* Responsivo */
+        @media (max-width: 550px) {
+            .game-container { padding: 20px; }
+            .title { font-size: 1.6rem; }
+            .aba h2 { font-size: 1.5rem; }
+            .btn { font-size: 1rem; padding: 12px 18px; min-width: 100px; }
+            .valor-box { font-size: 1.4rem; }
+            .quadrado-cor { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="game">
+
+    <!-- TÍTULO -->
+    <div class="title">
+        <span>🎮</span> JOGO DO PEDIDO
+        <span class="roxo-destaque">💜 ROXO PALÁCIO</span>
+        <span style="font-size: 1rem; margin-left: auto; background: none; color: #4a2a5a;">etapa <span id="etapaNumero">1</span>/5</span>
+    </div>
+
+    <!-- ========== ABAS (ETAPAS) ========== -->
+
+    <!-- Aba 1: Introdução -->
+    <div class="aba ativa" id="aba1">
+        <h2>📢 FASE 1: O PEDIDO</h2>
+        <p>Pai, nós (eu e minha irmã) preparamos este jogo para pedir formalmente permissão para <strong>pintar o quarto</strong> nas férias! 🎨</p>
+        <div class="amostra-cor">
+            <div class="quadrado-cor"></div>
+            <div><strong>Cor escolhida:</strong> <span class="cor-destaque">ROXO PALÁCIO</span> 💜</div>
+        </div>
+        <p style="margin-top: 8px;">Já decidimos a cor, cotamos os materiais e vamos pagar com nosso próprio dinheiro.</p>
+        <div class="botoes-aba">
+            <button class="btn btn-primary" onclick="proximaAba(2)">👉 Próximo</button>
+        </div>
+    </div>
+
+    <!-- Aba 2: Materiais e cores -->
+    <div class="aba" id="aba2">
+        <h2>🛠️ FASE 2: MATERIAIS & COR</h2>
+        <div class="amostra-cor">
+            <div class="quadrado-cor"></div>
+            <div><span class="cor-destaque">💜 ROXO PALÁCIO</span> <span style="font-size: 0.9rem;">(paredes principais)</span></div>
+        </div>
+        <p><strong>Combinação:</strong> Roxo Palácio nas paredes + branco neve nos rodapés e teto.</p>
+        <div class="lista-materiais">
+            <span>🎨 Tinta roxa</span> <span>🖌️ Pincel</span> <span>🧴 Massa corrida</span>
+            <span>📄 Lixa</span> <span>🔄 Rolo</span> <span>🔧 Espátula</span>
+        </div>
+        <p style="margin-top: 8px;">✅ Já vimos os preços e a quantidade necessária para o <strong>Roxo Palácio</strong>.</p>
+        <div class="botoes-aba">
+            <button class="btn btn-secondary" onclick="proximaAba(1)">⬅ Voltar</button>
+            <button class="btn btn-primary" onclick="proximaAba(3)">👉 Próximo</button>
+        </div>
+    </div>
+
+    <!-- Aba 3: Valor e pagamento -->
+    <div class="aba" id="aba3">
+        <h2>💰 FASE 3: VALOR & PAGAMENTO</h2>
+        <div class="valor-box">💵 Total estimado: R$ 160 — R$ 200</div>
+        <div class="plano">
+            <span>📆 Parcelas: 5 ou 6 vezes</span>
+            <span>💳 R$ 32 por mês</span>
+        </div>
+        <p><strong>Nós vamos pagar!</strong> Sem custo para o senhor. 😊</p>
+        <p style="margin-top: 6px;">💜 <em>Tudo para deixar o quarto com a cor <strong>Roxo Palácio</strong> que a gente ama!</em></p>
+        <div class="botoes-aba">
+            <button class="btn btn-secondary" onclick="proximaAba(2)">⬅ Voltar</button>
+            <button class="btn btn-primary" onclick="proximaAba(4)">👉 Próximo</button>
+        </div>
+    </div>
+
+    <!-- Aba 4: Reforço do pedido + botão decisão -->
+    <div class="aba" id="aba4">
+        <h2>🤝 FASE 4: DECISÃO FINAL</h2>
+        <div class="amostra-cor" style="justify-content: center;">
+            <div class="quadrado-cor"></div>
+            <div style="font-size: 1.4rem; font-weight: 700;">💜 ROXO PALÁCIO</div>
+        </div>
+        <p style="font-size: 1.3rem;">Com todas as informações, <strong>você autoriza a pintura com <span class="cor-destaque">Roxo Palácio</span>?</strong></p>
+        <p style="margin-top: 6px; background: #d9c6e3; padding: 6px 18px; border-radius: 60px; display: inline-block;">👨‍👧 Eu e minha irmã estamos prontos!</p>
+        <div class="botoes-aba" style="margin-top: 25px;">
+            <button class="btn btn-success" id="btnSim" onclick="escolhaSim()">✅ SIM, autorizo!</button>
+            <button class="btn btn-danger" id="btnNao" onclick="escolhaNao()">❌ NÃO autorizo</button>
+        </div>
+        <div style="margin-top: 12px;">
+            <button class="btn btn-secondary" onclick="proximaAba(3)">⬅ Voltar</button>
+        </div>
+    </div>
+
+    <!-- ========== TELAS FINAIS (comemoração / tristeza) ========== -->
+
+    <!-- Tela de comemoração (SIM) -->
+    <div class="tela-final" id="telaComemoracao" style="background: #f0e6f5;">
+        <span class="emoji-gigante">🎉💜🥳💜🎉</span>
+        <h2 style="color: #4a2055;">AEEEE! VAMOS PINTAR DE ROXO PALÁCIO!</h2>
+        <div style="display: flex; justify-content: center; gap: 20px; margin: 10px 0;">
+            <div class="quadrado-cor" style="width: 70px; height: 70px;"></div>
+        </div>
+        <p>Muito obrigado, pai! 🧡<br>O quarto vai ficar <strong>lindo com essa cor</strong>! Vamos caprichar!</p>
+        <p style="font-size: 1.2rem; background: #7b3f8a; color: white; padding: 8px 20px; border-radius: 60px; display: inline-block;">✅ Pintura autorizada com sucesso!</p>
+        <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="reiniciarJogo()">🔄 Jogar novamente</button>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.9rem; color: #2c3e50;">(agora é só comprar os materiais e mãos à obra!)</div>
+    </div>
+
+    <!-- Tela de tristeza (NÃO) -->
+    <div class="tela-final" id="telaTristeza" style="background: #f5effa;">
+        <span class="emoji-gigante">😢💔😞</span>
+        <h2 style="color: #4a2055;">Ah, que pena...</h2>
+        <p>Entendemos, pai. Ficamos tristes, mas respeitamos sua decisão.</p>
+        <p style="font-size: 1.1rem;">Quem sabe em outra oportunidade a gente pinta de <strong>Roxo Palácio</strong>? 🤞</p>
+        <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="reiniciarJogo()">🔄 Tentar novamente</button>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="footer">
+        ✍️ Feito com carinho por <strong>eu e minha irmã</strong> — para o melhor pai do mundo.
+        <span style="display: block; font-size: 0.9rem; margin-top: 4px;">💜 Cor escolhida: ROXO PALÁCIO</span>
+    </div>
+</div>
+
+<script>
+    // CONTROLE DE ABAS
+    let abaAtual = 1;
+    const totalAbas = 4;
+
+    function proximaAba(numero) {
+        // Esconde todas as abas
+        document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativa'));
+        // Mostra a aba solicitada
+        const aba = document.getElementById('aba' + numero);
+        if (aba) aba.classList.add('ativa');
+        abaAtual = numero;
+        document.getElementById('etapaNumero').textContent = numero;
+
+        // Garante que as telas finais estão escondidas
+        document.getElementById('telaComemoracao').classList.remove('ativa');
+        document.getElementById('telaTristeza').classList.remove('ativa');
+        // Mostra as abas novamente (caso estivessem ocultas)
+        document.querySelectorAll('.aba').forEach(el => el.style.display = '');
+        document.querySelectorAll('.tela-final').forEach(el => el.style.display = '');
+        // Garante que as abas fiquem com o display correto
+        document.querySelectorAll('.aba:not(.ativa)').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.aba.ativa').forEach(el => el.style.display = 'block');
+    }
+
+    // Inicializa: mostra apenas a aba 1
+    (function init() {
+        document.querySelectorAll('.aba').forEach(el => {
+            if (el.id !== 'aba1') el.style.display = 'none';
+            else el.style.display = 'block';
+        });
+        document.querySelectorAll('.tela-final').forEach(el => el.style.display = 'none');
+        document.getElementById('etapaNumero').textContent = '1';
+    })();
+
+    // FUNÇÕES DE ESCOLHA (SIM / NÃO) com lógica de "tem certeza?"
+    let contadorNao = 0;
+
+    function escolhaSim() {
+        // Esconde todas as abas e telas finais
+        document.querySelectorAll('.aba').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+        document.querySelectorAll('.tela-final').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+
+        // Mostra tela de comemoração
+        const tela = document.getElementById('telaComemoracao');
+        tela.style.display = 'block';
+        tela.classList.add('ativa');
+        document.getElementById('etapaNumero').textContent = '💜';
+    }
+
+    function escolhaNao() {
+        contadorNao++;
+
+        if (contadorNao === 1) {
+            // Primeiro não: pergunta "tem certeza?"
+            const aba4 = document.getElementById('aba4');
+            // Adiciona um aviso dentro da aba4 (sem perder o conteúdo)
+            let aviso = document.getElementById('avisoCerteza');
+            if (!aviso) {
+                aviso = document.createElement('div');
+                aviso.id = 'avisoCerteza';
+                aviso.style.cssText = 'background: #e8d0f0; padding: 14px; border-radius: 60px; margin-top: 18px; font-size: 1.2rem; font-weight: 600; color: #3d1d47; border: 2px solid #7b3f8a;';
+                aviso.innerHTML = '🤔 Tem certeza, pai? Reconsidere! 💜<br><span style="font-size: 0.9rem; font-weight: normal;">Clique em "NÃO" novamente para confirmar, ou em "SIM" para autorizar o <strong>Roxo Palácio</strong>.</span>';
+                const botoes = document.querySelector('#aba4 .botoes-aba');
+                botoes.parentNode.insertBefore(aviso, botoes);
+            }
+            // Destacar os botões
+            document.getElementById('btnSim').style.transform = 'scale(1.05)';
+            document.getElementById('btnNao').style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                document.getElementById('btnSim').style.transform = '';
+                document.getElementById('btnNao').style.transform = '';
+            }, 400);
+
+        } else if (contadorNao >= 2) {
+            // Segundo não (ou mais): vai para tela tristeza
+            document.querySelectorAll('.aba').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+            document.querySelectorAll('.tela-final').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+
+            const telaTriste = document.getElementById('telaTristeza');
+            telaTriste.style.display = 'block';
+            telaTriste.classList.add('ativa');
+            document.getElementById('etapaNumero').textContent = '😞';
+
+            // Remove o aviso de certeza (caso exista)
+            const aviso = document.getElementById('avisoCerteza');
+            if (aviso) aviso.remove();
+            contadorNao = 0; // reseta para próxima rodada
+        }
+    }
+
+    // Função para reiniciar o jogo (volta para a aba 1)
+    function reiniciarJogo() {
+        contadorNao = 0;
+        // Remove aviso de certeza se existir
+        const aviso = document.getElementById('avisoCerteza');
+        if (aviso) aviso.remove();
+
+        // Esconde telas finais
+        document.querySelectorAll('.tela-final').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+
+        // Mostra a aba 1 e esconde as outras
+        document.querySelectorAll('.aba').forEach(el => { el.style.display = 'none'; el.classList.remove('ativa'); });
+        const aba1 = document.getElementById('aba1');
+        aba1.style.display = 'block';
+        aba1.classList.add('ativa');
+        document.getElementById('etapaNumero').textContent = '1';
+        abaAtual = 1;
+
+        // Reseta botões da aba4 (remove escala)
+        document.getElementById('btnSim').style.transform = '';
+        document.getElementById('btnNao').style.transform = '';
+    }
+
+    // Sobrescreve o comportamento dos botões SIM/NAO para lidar com o aviso
+    const btnSimOriginal = document.getElementById('btnSim');
+    btnSimOriginal.addEventListener('click', function() {
+        const aviso = document.getElementById('avisoCerteza');
+        if (aviso) aviso.remove();
+        contadorNao = 0;
+    });
+
+    // Se clicar em voltar, remove aviso também
+    document.querySelectorAll('.btn-secondary').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const aviso = document.getElementById('avisoCerteza');
+            if (aviso) aviso.remove();
+            contadorNao = 0;
+            document.getElementById('btnSim').style.transform = '';
+            document.getElementById('btnNao').style.transform = '';
+        });
+    });
+
+</script>
+
+</body>
+</html>
